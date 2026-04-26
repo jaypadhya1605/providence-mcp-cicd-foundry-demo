@@ -57,6 +57,10 @@ def _sse_bytes(payload: dict[str, Any]) -> bytes:
     return f"event: message\ndata: {json.dumps(payload)}\n\n".encode("utf-8")
 
 
+def _path_name(path: str) -> str:
+    return path.split("?", 1)[0].rstrip("/") or "/"
+
+
 class MCPHttpHandler(BaseHTTPRequestHandler):
     server_version = "ProvidenceMCPHTTP/0.1"
 
@@ -66,13 +70,15 @@ class MCPHttpHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self) -> None:
-        if self.path.rstrip("/") in {"", "/health"}:
+        path = _path_name(self.path)
+        if path in {"/", "/health", "/mcp", "/api/mcp"}:
             self._send_json(200, {"status": "ok", "server": "providence-mcp-cicd-context"})
             return
         self._send_json(404, {"error": "Not found. POST MCP JSON-RPC messages to /mcp."})
 
     def do_POST(self) -> None:
-        if self.path.rstrip("/") not in {"", "/mcp", "/api/mcp"}:
+        path = _path_name(self.path)
+        if path not in {"/", "/mcp", "/api/mcp"}:
             self._send_json(404, {"error": "Not found. POST MCP JSON-RPC messages to /mcp."})
             return
 
@@ -95,8 +101,10 @@ class MCPHttpHandler(BaseHTTPRequestHandler):
 
     def _send_common_headers(self) -> None:
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "content-type, accept, mcp-session-id")
+        self.send_header("Access-Control-Allow-Headers", "content-type, accept, mcp-session-id, mcp-protocol-version")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Mcp-Session-Id", "providence-demo-session")
+        self.send_header("Mcp-Protocol-Version", "2024-11-05")
 
     def _send_json(self, status_code: int, payload: dict[str, Any]) -> None:
         body = _json_bytes(payload)
