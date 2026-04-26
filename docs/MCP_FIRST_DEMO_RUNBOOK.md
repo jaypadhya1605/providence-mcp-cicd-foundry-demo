@@ -15,6 +15,7 @@ Start in Azure AI Foundry because that is the product experience Providence need
 5. Show that the agent can be connected to MCP servers.
 6. Show the GitHub MCP connection.
 7. Show the Microsoft Learn MCP connection.
+8. Add the local Providence MCP bridge if you want `myMCP-demo-Agent` to call the repo's local MCP tools live. See [FOUNDRY_LOCAL_MCP_BRIDGE.md](FOUNDRY_LOCAL_MCP_BRIDGE.md).
 
 For Microsoft Learn MCP, use:
 
@@ -40,11 +41,19 @@ Suggested Foundry agent prompt for GitHub MCP:
 Use GitHub MCP to inspect the repository jaypadhya1605/providence-mcp-cicd-foundry-demo. Explain what the GitHub Actions workflow does and how it gates promotion from dev to test to prod.
 ```
 
+Suggested Foundry agent prompt for the local Providence MCP bridge:
+
+```text
+Use the Providence local MCP tool to get the promotion policy and GitHub CI/CD context. Then explain how a failed custom evaluator blocks promotion from dev to test.
+```
+
 Talk track:
 
 ```text
 This is the first important idea: MCP is how the agent reaches governed external context and actions. In Foundry, the agent can use MCP tools such as GitHub and Microsoft Learn. The agent is no longer limited to static prompt text; it can call tools, inspect trusted sources, and reason over the results.
 ```
+
+If you add the local Providence MCP bridge, open Foundry Traces after the agent response and show the tool call to your own MCP endpoint.
 
 ## Step 2 - Show The Same Pattern In Code
 

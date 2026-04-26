@@ -12,4 +12,5 @@ eval-outputs/*.md
 *.crt
 *.cert
 *.docx
+*.pptx
 Session-5-meeting-notes.txt
