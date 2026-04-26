@@ -1,0 +1,99 @@
+name: Providence MCP CI/CD Evaluation
+
+on:
+  pull_request:
+    paths:
+      - "demo/**"
+      - "datasets/**"
+      - "spec-kit/**"
+      - "skills/**"
+      - ".github/workflows/providence-mcp-cicd-evaluation.yml"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      use_case:
+        description: "Demo path to run"
+        required: false
+        default: "success"
+        type: choice
+        options:
+          - success
+          - failure
+
+jobs:
+  dev-evaluation-gate:
+    name: Dev evaluator gate
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Run custom evaluator gate
+        shell: pwsh
+        run: |
+          $useCase = "${{ github.event.inputs.use_case }}"
+          if ($useCase -eq "failure") {
+            python demo/run_demo.py --simulate-failure --ci --fail-on-gate
+          }
+          else {
+            python demo/run_demo.py --ci --fail-on-gate
+          }
+
+      - name: Upload evaluation artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: providence-mcp-cicd-eval-outputs
+          path: eval-outputs/
+
+      - name: Add job summary
+        if: always()
+        shell: pwsh
+        run: |
+          Get-Content eval-outputs/github-actions-summary.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+  promote-to-test:
+    name: Promote release candidate to test
+    runs-on: ubuntu-latest
+    needs: dev-evaluation-gate
+    if: needs.dev-evaluation-gate.result == 'success'
+    environment: test
+    steps:
+      - name: Record test promotion
+        run: |
+          echo "Custom evaluator gate passed. Release candidate is ready for test evaluation."
+
+  prod-handoff:
+    name: Production handoff checkpoint
+    runs-on: ubuntu-latest
+    needs: promote-to-test
+    if: needs.promote-to-test.result == 'success'
+    environment: prod
+    steps:
+      - name: Record production handoff
+        run: |
+          echo "Prod is not auto-promoted. Production team approval is required after test evidence is reviewed."
+
+# Live Azure path, enabled after tenant auth and OIDC are configured:
+# - uses: azure/login@v2
+#   with:
+#     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+#     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+# - name: Run live Foundry evaluator gate
+#   run: python demo/run_demo.py --ci --fail-on-gate

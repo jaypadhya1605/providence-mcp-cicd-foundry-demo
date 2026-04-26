@@ -1,0 +1,1 @@
+"""Providence MCP + CI/CD demo package."""
