@@ -43,11 +43,13 @@ See [docs/GITHUB_ACTIONS_DEMO.md](docs/GITHUB_ACTIONS_DEMO.md) for the exact run
 
 ## What To Show Live
 
-1. Open [Demo-mapping.md](Demo-mapping.md) and frame the ask.
-2. Open [spec-kit/feature-spec.md](spec-kit/feature-spec.md) and show the spec-driven structure.
-3. Open [skills/providence-mcp-cicd-demo/SKILL.md](skills/providence-mcp-cicd-demo/SKILL.md) and show how repeatable agent workflows are packaged.
-4. Run `python demo/run_demo.py`.
-5. Open `eval-outputs/github-actions-summary.md` and show the gate result.
+Use the MCP-first flow in [docs/MCP_FIRST_DEMO_RUNBOOK.md](docs/MCP_FIRST_DEMO_RUNBOOK.md):
+
+1. Start in Azure AI Foundry and show the agent connected to GitHub MCP and Microsoft Learn MCP.
+2. Open [demo/mcp_server.py](demo/mcp_server.py) to show the local MCP tools.
+3. Open [demo/mcp_client.py](demo/mcp_client.py) to show tool discovery and tool calls.
+4. Open [demo/run_demo.py](demo/run_demo.py) and [demo/agent.py](demo/agent.py) to show the MCP context connected to the agent response.
+5. Run `python demo/run_demo.py` and show `eval-outputs/demo-run.json`.
 6. Open [.github/workflows/providence-mcp-cicd-evaluation.yml](.github/workflows/providence-mcp-cicd-evaluation.yml) and connect it to dev -> test -> prod promotion.
 
 ## Azure Notes
