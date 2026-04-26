@@ -7,6 +7,8 @@ on:
       - "datasets/**"
       - "spec-kit/**"
       - "skills/**"
+      - "Dockerfile"
+      - ".dockerignore"
       - ".github/workflows/providence-mcp-cicd-evaluation.yml"
   push:
     branches:
@@ -21,6 +23,19 @@ on:
         options:
           - success
           - failure
+      run_hosted_mcp_smoke:
+        description: "Run hosted MCP endpoint smoke gate before local evaluation"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      hosted_mcp_endpoint:
+        description: "Optional hosted MCP endpoint override. Otherwise uses repository variable MCP_HTTP_ENDPOINT."
+        required: false
+        default: ""
+        type: string
 
 jobs:
   dev-evaluation-gate:
@@ -42,6 +57,12 @@ jobs:
 
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+
+      - name: Run hosted MCP smoke gate
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_hosted_mcp_smoke == 'true' }}
+        env:
+          MCP_HTTP_ENDPOINT: ${{ github.event.inputs.hosted_mcp_endpoint || vars.MCP_HTTP_ENDPOINT }}
+        run: python demo/smoke_mcp_http.py
 
       - name: Run custom evaluator gate
         shell: pwsh
@@ -65,7 +86,13 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          Get-Content eval-outputs/github-actions-summary.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          if (Test-Path eval-outputs/hosted-mcp-smoke-summary.md) {
+            Get-Content eval-outputs/hosted-mcp-smoke-summary.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
+          if (Test-Path eval-outputs/github-actions-summary.md) {
+            Get-Content eval-outputs/github-actions-summary.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
 
   promote-to-test:
     name: Promote release candidate to test

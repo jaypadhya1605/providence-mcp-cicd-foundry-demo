@@ -1,0 +1,18 @@
+.azure/
+.git/
+.github/
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+azure-resources.docx
+Foundry Tools L100.PPTX
+Session-5-meeting-notes.txt
+eval-outputs/
+*.pem
+*.key
+*.crt
+*.cert
+*.docx
+*.pptx

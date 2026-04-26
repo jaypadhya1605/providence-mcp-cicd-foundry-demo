@@ -39,6 +39,8 @@ The workflow in [.github/workflows/providence-mcp-cicd-evaluation.yml](.github/w
 - `use_case = success` runs the normal evaluator gate and promotes the release candidate from dev to test.
 - `use_case = failure` injects a bad response, blocks in dev, uploads the failed evaluation artifacts, and prevents test/prod handoff jobs from running.
 
+For the hosted MCP path, run the workflow manually with `run_hosted_mcp_smoke = true` and either set repository variable `MCP_HTTP_ENDPOINT` or provide `hosted_mcp_endpoint`. This adds a live pre-check that calls the Azure-hosted MCP server before the local evaluator gate runs.
+
 See [docs/GITHUB_ACTIONS_DEMO.md](docs/GITHUB_ACTIONS_DEMO.md) for the exact runbook and talk track.
 
 ## What To Show Live
