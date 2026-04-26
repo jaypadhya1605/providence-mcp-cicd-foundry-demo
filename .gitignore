@@ -14,3 +14,9 @@ eval-outputs/*.md
 *.docx
 *.pptx
 Session-5-meeting-notes.txt
+
+# Local learning and presenter-only materials
+docs/
+skills/
+spec-kit/
+tools/create-session5-deck.ps1

@@ -64,7 +64,7 @@ def _tool_definitions() -> list[dict[str, Any]]:
         },
         {
             "name": "get_github_cicd_context",
-            "description": "Returns GitHub Actions trigger and OIDC guidance for the demo.",
+            "description": "Returns GitHub Actions trigger and OIDC authentication guidance for the demo.",
             "inputSchema": {"type": "object", "properties": {}},
         },
     ]
